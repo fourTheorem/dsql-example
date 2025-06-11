@@ -1,0 +1,21 @@
+{
+  "name": "cli",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@fastify/aws-lambda": "^5.1.4",
+    "@h4ad/serverless-adapter": "^4.4.0",
+    "api": "^1.0.0",
+    "cli": "^1.0.0",
+    "db": "^1.0.0",
+    "fastify": "^5.3.3",
+    "model": "^1.0.0"
+  }
+}

@@ -1,14 +1,12 @@
-# Welcome to your CDK TypeScript project
+# DSQL Example
 
-This is a blank project for CDK development with TypeScript.
+## Prerequisites
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+- A recent [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) version that supports DSQL (`aws dsql`).
+- Node.js 22 or later
 
-## Useful commands
+## Creating the Schema
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+```shell
+cat packages/db/drizzle/*.sql | ./bin/dsql-connect --hostname riabuesefmctvmgwk2nhkam7oi.dsql.eu-west-1.on.aws --region eu-west-1 --database postgres --username admin
+```

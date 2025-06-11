@@ -1,0 +1,29 @@
+{
+  "name": "model",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@fastify/aws-lambda": "^5.1.4",
+    "@h4ad/serverless-adapter": "^4.4.0",
+    "api": "^1.0.0",
+    "cli": "^1.0.0",
+    "db": "^1.0.0",
+    "drizzle-orm": "^0.44.2",
+    "fastify": "^5.3.3",
+    "gel": "^2.1.0",
+    "model": "^1.0.0",
+    "pg": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.4",
+    "drizzle-kit": "^0.31.1",
+    "tsx": "^4.20.0"
+  }
+}
