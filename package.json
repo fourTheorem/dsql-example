@@ -1,5 +1,6 @@
 {
   "name": "dsql-example",
+  "type": "module",
   "version": "1.0.0",
   "description": "This is a blank project for CDK development with TypeScript.",
   "main": "index.js",
@@ -15,11 +16,7 @@
     "packages/cli",
     "packages/api"
   ],
-  "dependencies": {
-    "@aws-sdk/dsql-signer": "^3.826.0",
-    "postgres": "^3.4.7"
-  },
   "devDependencies": {
-    "wtfnode": "^0.10.0"
+    "@tsconfig/recommended": "^1.0.8"
   }
 }

@@ -22,7 +22,12 @@ export class ApplicationStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: "handleEvent",
       environment: {
+        NODE_OPTIONS: "--enable-source-maps",
         DB_ENDPOINT: dbEndpoint,
+      },
+      bundling: {
+        format: lambdaNodejs.OutputFormat.CJS,
+        sourceMap: true,
       }
     });
 
@@ -40,6 +45,7 @@ export class ApplicationStack extends cdk.Stack {
       api.root.addMethod(method, apiIntegration);
       itemsResource.addMethod(method, apiIntegration);
     }
+    api.root.addResource("openapi.json").addMethod("GET", apiIntegration);
 
     exportParameters(this, {
       restApiId: api.restApiId,
