@@ -1,4 +1,4 @@
-import fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
+import fastify from 'fastify';
 import { getDb } from '../db/connection.ts';
 import { items, lists } from '../model/schema.ts';
 import fastifySwagger from '@fastify/swagger';
@@ -7,7 +7,6 @@ import { and, eq } from 'drizzle-orm';
 type Item = typeof items.$inferInsert;
 type ItemSelect = typeof items.$inferSelect
 type List = typeof lists.$inferInsert;
-type ListSelect = typeof lists.$inferSelect
 type IdParams = { id: string; };
 
 getDb();  // Initiate connection at module load time
@@ -46,11 +45,11 @@ export async function init() {
     return app.swagger();
   });
 
-  app.get('/', { schema: { hide: true } }, (_, reply: FastifyReply) => {
+  app.get('/', { schema: { hide: true } }, (_, reply) => {
     reply.send({ "hi": "there" });
   });
 
-  app.get('/lists', async (_, reply: FastifyReply<{ Reply: ListSelect[] }>) => {
+  app.get<{ Reply: ApiReply<List[]> }>('/lists', async (_, reply) => {
     const records = await db.select().from(lists);
     reply.send(records);
   });
@@ -68,19 +67,19 @@ export async function init() {
     reply.code(201).send(record[0]);
   });
 
-  app.delete<{ Params: IdParams, Reply: ApiReply<{}> }>('/lists/:id', (request, reply) => {
-    db.delete(lists).where(eq(lists.id, request.params.id));
+  app.delete<{ Params: IdParams, Reply: ApiReply<{}> }>('/lists/:id', async (request, reply) => {
+    await db.delete(lists).where(eq(lists.id, request.params.id));
     reply.send({});
   });
 
-  app.put<{ Params: IdParams, Body: List, Reply: ApiReply<{}> }>('/lists/:id', (request, reply) => {
+  app.put<{ Params: IdParams, Body: List, Reply: ApiReply<{}> }>('/lists/:id', async (request, reply) => {
     const { body, params: { id } } = request;
-    db.insert(lists).values({ ...body, id })
+    await db.insert(lists).values({ ...body, id })
       .onConflictDoUpdate({ target: lists.id, set: body });
     reply.send({});
   });
 
-  app.patch<{ Body: List, Params: IdParams, Reply: ApiReply<{}> }>('/lists/:id', (request, reply) => {
+  app.patch<{ Body: List, Params: IdParams, Reply: ApiReply<{}> }>('/lists/:id', async (request, reply) => {
     db.update(lists).set(request.body).where(eq(lists.id, request.params.id));
     reply.send({});
   });
@@ -97,6 +96,11 @@ export async function init() {
       return reply.code(404)
     }
     reply.send(records[0]);
+  });
+
+  app.post<{ Params: IdParams, Body: Item, Reply: ApiReply<Item> }>('lists/:id/items', async (request, reply) => {
+    const record = await db.insert(items).values({ ...request.body, listId: request.params.id }).returning();
+    reply.code(201).send(record[0]);
   });
 
   await app.ready();
