@@ -1,6 +1,7 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { DsqlSigner } from "@aws-sdk/dsql-signer";
+import * as schema from '../model/schema';
 
 const { AWS_REGION, DB_ENDPOINT } = process.env;
 if (!AWS_REGION || !DB_ENDPOINT) {
@@ -28,7 +29,7 @@ const dbUrlPromise = (async function createDbUrl() {
 const dbPromise = (async function createDb() {
   const dbConfig = await dbUrlPromise;
   const client = postgres(dbConfig);
-  return drizzle({ client });
+  return drizzle({ client, schema });
 })();
 
 export async function getDbConfig() {
