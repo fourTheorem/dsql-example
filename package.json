@@ -2,11 +2,8 @@
   "name": "dsql-example",
   "type": "module",
   "version": "1.0.0",
-  "description": "This is a blank project for CDK development with TypeScript.",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -18,5 +15,8 @@
   ],
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.8"
+  },
+  "dependencies": {
+    "@aws-lambda-powertools/tracer": "^2.21.0"
   }
 }

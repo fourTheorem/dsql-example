@@ -1,16 +1,15 @@
 {
   "extends": "@tsconfig/recommended",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "preserve",
-    "moduleResolution": "bundler",
+    "target": "es2022",
+    "module": "es2022",
+    "moduleResolution": "node",
     "lib": [
       "es2022"
     ],
     "typeRoots": [
       "./node_modules/@types"
     ],
-    "allowImportingTsExtensions": true
   },
   "exclude": [
     "node_modules",

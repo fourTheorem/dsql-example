@@ -3,6 +3,9 @@ import { FastifyFramework } from '@h4ad/serverless-adapter/frameworks/fastify';
 import { DefaultHandler } from '@h4ad/serverless-adapter/handlers/default';
 import { PromiseResolver } from '@h4ad/serverless-adapter/resolvers/promise';
 import { ApiGatewayV1Adapter } from '@h4ad/serverless-adapter/adapters/aws';
+import { Subsegment, Tracer } from '@aws-lambda-powertools/tracer';
+
+const tracer = new Tracer({ serviceName: 'dsqlExample' });
 
 import { init } from './api';
 
@@ -17,7 +20,35 @@ const adapterHandlerPromise = (async function() {
 })();
 
 export async function handleEvent() {
-  console.log({ event: arguments[0] });
+  const segment = tracer.getSegment(); // This is the facade segment (the one that is created by AWS Lambda)
+  let subsegment: Subsegment | undefined;
+  if (segment) {
+    // Create subsegment for the function & set it as active
+    subsegment = segment.addNewSubsegment(`## ${process.env._HANDLER}`);
+    tracer.setSegment(subsegment);
+  }
+
+  // Annotate the subsegment with the cold start & serviceName
+  tracer.annotateColdStart();
+  tracer.addServiceNameAnnotation();
+
   const adapterHandler = await adapterHandlerPromise;
-  return await adapterHandler(...arguments);
+  const res = await adapterHandler(...arguments);
+  try {
+    // Add the response as metadata
+    tracer.addResponseAsMetadata({}, process.env._HANDLER);
+  } catch (err) {
+    // Add the error as metadata
+    tracer.addErrorAsMetadata(err as Error);
+    throw err;
+  } finally {
+    if (segment && subsegment) {
+      // Close subsegment (the AWS Lambda one is closed automatically)
+      subsegment.close();
+      // Set back the facade segment as active again
+      tracer.setSegment(segment);
+    }
+  }
+  return res;
+
 }

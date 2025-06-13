@@ -1,15 +1,10 @@
-import { testConnection } from "../db/connection.ts";
-import wtf from 'wtfnode';
+import { testConnection, getDb } from "../db/connection";
 
 async function main() {
   await testConnection();
+  const db = await getDb();
+  db.$client.end()
   console.error("Connection tested");
 }
-
-process.on('exit', (code) => {
-  console.error(`Process exited with code: ${code}`);
-
-  wtf.dump();
-});
 
 main();

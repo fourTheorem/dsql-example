@@ -11,7 +11,7 @@ if (!AWS_REGION || !DB_ENDPOINT) {
 const dbUrlPromise = (async function createDbUrl() {
   let url;
   if (DB_ENDPOINT === "localhost") {
-    url = `postgres://postgres:password@localhost:5432/postgres`;
+    url = `postgres://postgres:postgres@localhost:5432/postgres`;
   }
   else {
     const token = await generateAdminToken();

@@ -18,6 +18,7 @@ export class DsqlExampleStack extends cdk.Stack {
     exportParameters(this, {
       "vpc-endpoint-service-name": cluster.attrVpcEndpointServiceName,
       "endpoint": `${cluster.ref}.dsql.${this.region}.on.aws`,
+      "cluster-id": cluster.ref,
     });
   }
 }

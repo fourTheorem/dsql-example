@@ -13,9 +13,14 @@
   "dependencies": {
     "@aws-sdk/dsql-signer": "^3.828.0",
     "@fastify/swagger": "^9.5.1",
+    "@fastify/swagger-ui": "^5.2.3",
     "@h4ad/serverless-adapter": "^4.4.0",
+    "api": "^1.0.0",
     "db": "^1.0.0",
-    "fastify": "^5.3.3",
-    "postgres": "^3.4.7"
+    "fastify": "^5.4.0",
+    "fastify-type-provider-zod": "^5.0.1",
+    "postgres": "^3.4.7",
+    "zod": "^3.25.63",
+    "zod-to-openapi": "^0.2.1"
   }
 }
