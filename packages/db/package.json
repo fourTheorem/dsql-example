@@ -10,11 +10,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-lambda-powertools/tracer": "^2.22.0",
     "@aws-sdk/dsql-signer": "^3.828.0",
     "@fastify/swagger": "^9.5.1",
     "@fastify/swagger-ui": "^5.2.3",
     "@h4ad/serverless-adapter": "^4.4.0",
     "api": "^1.0.0",
+    "aws-xray-sdk-core": "^3.10.3",
     "fastify": "^5.4.0",
     "fastify-type-provider-zod": "^5.0.1",
     "model": "^1.0.0",

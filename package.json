@@ -17,6 +17,7 @@
     "@tsconfig/recommended": "^1.0.8"
   },
   "dependencies": {
-    "@aws-lambda-powertools/tracer": "^2.21.0"
+    "@aws-lambda-powertools/tracer": "^2.22.0",
+    "@smithy/service-error-classification": "^4.0.5"
   }
 }

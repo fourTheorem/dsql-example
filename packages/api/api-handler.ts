@@ -50,5 +50,4 @@ export async function handleEvent() {
     }
   }
   return res;
-
 }

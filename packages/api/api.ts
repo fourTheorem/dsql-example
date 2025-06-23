@@ -227,7 +227,7 @@ export async function init() {
 
 if (!process.env.AWS_LAMBDA_RUNTIME_API) {
   // called directly i.e. "ts-node api-handler.ts"
-  (async function () {
+  (async function() {
     (await init()).listen({ port: 3000 }, (err) => {
       if (err) console.error(err);
       console.log('server listening on 3000');

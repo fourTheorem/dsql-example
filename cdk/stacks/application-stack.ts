@@ -27,6 +27,7 @@ export class ApplicationStack extends cdk.Stack {
       memorySize: 512,
       timeout: cdk.Duration.seconds(15),
       handler: "handleEvent",
+      tracing: lambda.Tracing.ACTIVE,
       environment: {
         NODE_OPTIONS: "--enable-source-maps",
         DB_ENDPOINT: dbEndpoint,
@@ -36,6 +37,7 @@ export class ApplicationStack extends cdk.Stack {
         sourceMap: true,
       }
     });
+
     apiFunction.addToRolePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: ["dsql:DbConnectAdmin"],
@@ -47,7 +49,10 @@ export class ApplicationStack extends cdk.Stack {
       defaultCorsPreflightOptions: {
         allowOrigins: ['*'],
         allowMethods: HTTP_METHODS,
-      }
+      },
+      deployOptions: {
+        tracingEnabled: true,
+      },
     });
 
     const apiIntegration = new apigateway.LambdaIntegration(apiFunction, {
