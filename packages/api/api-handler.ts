@@ -34,10 +34,14 @@ export async function handleEvent() {
 
   const adapterHandler = await adapterHandlerPromise;
   const res = await adapterHandler(...arguments);
+
+  console.log({ res });
+
   try {
     // Add the response as metadata
     tracer.addResponseAsMetadata({}, process.env._HANDLER);
   } catch (err) {
+    console.error({ err });
     // Add the error as metadata
     tracer.addErrorAsMetadata(err as Error);
     throw err;

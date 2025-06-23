@@ -31,11 +31,22 @@ export class ApplicationStack extends cdk.Stack {
       environment: {
         NODE_OPTIONS: "--enable-source-maps",
         DB_ENDPOINT: dbEndpoint,
+        AWS_XRAY_COLLECT_SQL_QUERIES: "true",
       },
       bundling: {
-        format: lambdaNodejs.OutputFormat.CJS,
+        // NOTE: the following 3 lines should solve the runtime error:
+        //   >> Dynamic require of \"node:os\" is not supported
+        //   ref: https://github.com/evanw/esbuild/issues/1921#issuecomment-2302290651
+        format: lambdaNodejs.OutputFormat.ESM,
+        mainFields: ['module', 'main'],
+        banner: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);",
+        minify: true,
         sourceMap: true,
-      }
+        sourcesContent: true,
+        target: 'esnext',
+        bundleAwsSDK: true,
+        forceDockerBundling: false,
+      },
     });
 
     apiFunction.addToRolePolicy(new iam.PolicyStatement({

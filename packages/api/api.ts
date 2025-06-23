@@ -3,7 +3,7 @@ import { and, eq } from 'drizzle-orm';
 import fastify from 'fastify';
 import { jsonSchemaTransform, serializerCompiler, validatorCompiler, ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod/v4';
-import { getDb } from '../db/connection';
+import { getDb, testConnection } from '../db/connection';
 import { items, lists } from '../model/schema';
 import * as apiSchema from './api-schema';
 
@@ -30,6 +30,8 @@ const responseSchema = (bodySchema: z.ZodObject | z.ZodArray | z.ZodUndefined, s
 
 export async function init() {
   const db = await getDb();
+  await testConnection();
+
   const app = await fastify({ logger: true })
     .setValidatorCompiler(validatorCompiler)
     .setSerializerCompiler(serializerCompiler)
@@ -178,8 +180,8 @@ export async function init() {
         },
       },
     },
-  }, async (_, reply) => {
-    const records = await db.select().from(items);
+  }, async (request, reply) => {
+    const records = await db.select().from(items).where(eq(items.listId, request.params.listId));
     reply.send(records);
   });
 

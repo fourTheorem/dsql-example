@@ -1,7 +1,8 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import pg from 'pg';
 import { DsqlSigner } from "@aws-sdk/dsql-signer";
 import * as schema from '../model/schema';
+
 
 const { AWS_REGION, DB_ENDPOINT } = process.env;
 if (!AWS_REGION || !DB_ENDPOINT) {
@@ -22,17 +23,27 @@ const dbUrlPromise = (async function createDbUrl() {
     url = `postgres://${dbUser}:${encodedToken}@${DB_ENDPOINT}:${dbPort}/${databaseName}?sslmode=require`;
   }
 
-  console.log(url);
   return url;
 })();
 
 const dbPromise = (async function createDb() {
-  const dbConfig = await dbUrlPromise;
-  const client = postgres(dbConfig);
-  return drizzle({ client, schema });
+  const dbUrl = await dbUrlPromise;
+  let xrayPg;
+  if (process.env.AWS_LAMBDA_RUNTIME_API) {
+    const xraySdk = await import('aws-xray-sdk');
+    xrayPg = xraySdk.capturePostgres(pg);
+  } else {
+    xrayPg = pg;
+  }
+
+  const client = new xrayPg.Client({
+    connectionString: dbUrl,
+  });
+  await client.connect();
+  return drizzle({ client, schema, logger: true });
 })();
 
-export async function getDbConfig() {
+export async function getDbUrl() {
   return await dbUrlPromise;
 }
 
@@ -43,8 +54,7 @@ export async function getDb() {
 export async function testConnection() {
   const db = await getDb();
   console.error("Performing a test query");
-  const val = await db.execute("SELECT 1 + 1 AS result")
-  console.error("Test query result:", val);
+  await db.execute("SELECT 1 + 1 AS result")
 }
 
 async function generateAdminToken() {
