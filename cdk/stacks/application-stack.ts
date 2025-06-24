@@ -6,6 +6,7 @@ import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as lambdaNodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as xray from 'aws-cdk-lib/aws-xray';
 import { exportParameters } from '../lib/exports';
 
 const apiRootDir = path.resolve(__dirname, "..", "..", "packages", "api");
@@ -13,10 +14,28 @@ const apiRootDir = path.resolve(__dirname, "..", "..", "packages", "api");
 const HTTP_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "TRACE"];
 type HttpMethodType = typeof HTTP_METHODS[number];
 
+/**
+ * Route IDs used as trace annotations to segment data by route
+ */
+const ROUTE_IDS = [
+  "GET /lists",
+  "DELETE /lists/:id",
+  "GET /lists/:id",
+  "GET /lists/:listId/items/:id",
+  "PATCH /lists/:id",
+  "POST /lists/:id/items",
+  "PUT /lists/:id",
+  "POST /lists",
+  "GET /lists/:listId/items",
+];
 
 export class ApplicationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+
+    if (this.node.tryGetContext("slicWatch")) {
+      this.addTransform('SlicWatch-v3');
+    }
 
     const dbEndpoint = ssm.StringParameter.fromStringParameterName(this, "DbEndpointParam", "/dsql-example/endpoint").stringValue;
     const dbClusterId = ssm.StringParameter.fromStringParameterName(this, "DbClusterId", "/dsql-example/cluster-id").stringValue;
@@ -48,6 +67,17 @@ export class ApplicationStack extends cdk.Stack {
         forceDockerBundling: false,
       },
     });
+
+    for (const routeId of ROUTE_IDS) {
+      const safeId = routeId.replace(/\W+/g, '_');
+      new xray.CfnGroup(this, safeId, {
+        groupName: safeId,
+        filterExpression: `(Annotation[routeId] = "${routeId}")`,
+        insightsConfiguration: {
+          insightsEnabled: true,
+        }
+      });
+    }
 
     apiFunction.addToRolePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,

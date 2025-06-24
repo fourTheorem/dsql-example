@@ -50,9 +50,7 @@ export async function init() {
     })
     .withTypeProvider<ZodTypeProvider>();
 
-  app.addHook('onRequest', async (request, reply) => {
-    // const context = request[kRouteContext];
-    // const routeId = context.config.routeId
+  app.addHook('onRequest', async (request) => {
     const { method, url } = request.routeOptions;
     tracer.putAnnotation('routeId', `${method} ${url}`);
   });
@@ -238,7 +236,7 @@ export async function init() {
 
 if (!process.env.AWS_LAMBDA_RUNTIME_API) {
   // called directly i.e. "ts-node api-handler.ts"
-  (async function () {
+  (async function() {
     (await init()).listen({ port: 3000 }, (err) => {
       if (err) console.error(err);
       console.log('server listening on 3000');

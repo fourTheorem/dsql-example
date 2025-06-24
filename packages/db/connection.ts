@@ -40,7 +40,7 @@ const dbPromise = (async function createDb() {
     connectionString: dbUrl,
   });
   await client.connect();
-  return drizzle({ client, schema, logger: true });
+  return drizzle({ client, schema });
 })();
 
 export async function getDbUrl() {

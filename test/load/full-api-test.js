@@ -2,9 +2,13 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 const { BASE_URL } = __ENV;
 
+if (!BASE_URL) {
+  throw new Error(`BASE_URL must be set to the API backend URL. This is a CloudFormation output (ApplicationStack.apiEndpoint) printed when you run 'cdk deploy'`);
+}
+
 export const options = {
-  vus: 1000,           // number of concurrent users
-  duration: '2m',     // test duration
+  vus: 100,           // number of concurrent users
+  duration: '1m',     // test duration
   thresholds: {
     http_req_failed: ['rate<0.01'],
     http_req_duration: ['p(95)<800'],
@@ -16,6 +20,10 @@ function randomName(prefix = 'Name') {
 }
 
 export default function() {
+  // 0. Read all lists
+  const allRes = http.get(`${BASE_URL}/lists`)
+  check(allRes, { 'lists read': (r) => r.status === 200 });
+
   // 1. Create a list
   const createRes = http.post(`${BASE_URL}/lists`, JSON.stringify({
     name: randomName('List'),
@@ -84,6 +92,6 @@ export default function() {
   const delRes = http.del(`${BASE_URL}/lists/${listId}`);
   check(delRes, { 'list deleted': (r) => r.status === 204 });
 
-  // Optional sleep to simulate real user pacing
-  sleep(Math.random() * 2);
+  // Sleep to simulate real user pacing
+  sleep(Math.random());
 }

@@ -9,7 +9,7 @@ import {
   serializerCompiler,
   validatorCompiler,
   ZodTypeProvider,
-} from 'fastify-type-provider-zod';
+} from 'fastify-type-provider-zod/dist/cjs/index.cjs';
 
 const app = fastify();
 app.setValidatorCompiler(validatorCompiler);
