@@ -1,3 +1,3 @@
-import { Tracer } from '@aws-lambda-powertools/tracer';
+import { Tracer } from "@aws-lambda-powertools/tracer";
 
-export const tracer = new Tracer({ serviceName: 'dsqlExample' });
+export const tracer = new Tracer({ serviceName: "dsqlExample" });

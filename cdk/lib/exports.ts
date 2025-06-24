@@ -1,10 +1,10 @@
-import * as cdk from 'aws-cdk-lib';
-import * as ssm from 'aws-cdk-lib/aws-ssm';
+import * as cdk from "aws-cdk-lib";
+import * as ssm from "aws-cdk-lib/aws-ssm";
 
-import { Construct } from "constructs";
+import type { Construct } from "constructs";
 
 type Exports = {
-  [name: string]: string
+  [name: string]: string;
 };
 
 export function exportParameters(scope: Construct, exports: Exports) {
@@ -15,9 +15,8 @@ export function exportParameters(scope: Construct, exports: Exports) {
     });
     new cdk.CfnOutput(scope, `${name}-export`, {
       exportName: name,
-      key: name.replace(/\W/g, ''),
+      key: name.replace(/\W/g, ""),
       value,
-    })
+    });
   }
 }
-

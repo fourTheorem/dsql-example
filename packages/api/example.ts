@@ -1,15 +1,14 @@
-import fastify from 'fastify';
-import fastifySwagger from '@fastify/swagger';
-import fastifySwaggerUI from '@fastify/swagger-ui';
-import { z } from 'zod/v4';
-
+import fastifySwagger from "@fastify/swagger";
+import fastifySwaggerUI from "@fastify/swagger-ui";
+import fastify from "fastify";
 import {
-  jsonSchemaTransform,
   createJsonSchemaTransform,
+  jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
-  ZodTypeProvider,
-} from 'fastify-type-provider-zod/dist/cjs/index.cjs';
+  type ZodTypeProvider,
+} from "fastify-type-provider-zod/dist/cjs/index.cjs";
+import { z } from "zod/v4";
 
 const app = fastify();
 app.setValidatorCompiler(validatorCompiler);
@@ -18,9 +17,9 @@ app.setSerializerCompiler(serializerCompiler);
 app.register(fastifySwagger, {
   openapi: {
     info: {
-      title: 'SampleApi',
-      description: 'Sample backend service',
-      version: '1.0.0',
+      title: "SampleApi",
+      description: "Sample backend service",
+      version: "1.0.0",
     },
     servers: [],
   },
@@ -34,21 +33,21 @@ app.register(fastifySwagger, {
 });
 
 await app.register(fastifySwaggerUI, {
-  routePrefix: '/documentation',
+  routePrefix: "/documentation",
 });
 
 const LOGIN_SCHEMA = z.object({
-  username: z.string().max(32).describe('Some description for username'),
+  username: z.string().max(32).describe("Some description for username"),
   password: z.string().max(32),
 });
 
 // app.after(() => {
 app.withTypeProvider<ZodTypeProvider>().route({
-  method: 'POST',
-  url: '/login',
+  method: "POST",
+  url: "/login",
   schema: { body: LOGIN_SCHEMA },
   handler: (req, res) => {
-    res.send('ok');
+    res.send("ok");
   },
 });
 // });

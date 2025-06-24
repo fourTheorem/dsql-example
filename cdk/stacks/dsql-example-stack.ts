@@ -1,7 +1,7 @@
-import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-import * as dsql from 'aws-cdk-lib/aws-dsql';
-import { exportParameters } from '../lib/exports';
+import * as cdk from "aws-cdk-lib";
+import * as dsql from "aws-cdk-lib/aws-dsql";
+import type { Construct } from "constructs";
+import { exportParameters } from "../lib/exports";
 
 export class DsqlExampleStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -9,15 +9,17 @@ export class DsqlExampleStack extends cdk.Stack {
 
     const cluster = new dsql.CfnCluster(this, "DsqlExampleCluster", {
       deletionProtectionEnabled: false,
-      tags: [{
-        key: "Name",
-        value: "ft-dsql-example",
-      }]
+      tags: [
+        {
+          key: "Name",
+          value: "ft-dsql-example",
+        },
+      ],
     });
 
     exportParameters(this, {
       "vpc-endpoint-service-name": cluster.attrVpcEndpointServiceName,
-      "endpoint": `${cluster.ref}.dsql.${this.region}.on.aws`,
+      endpoint: `${cluster.ref}.dsql.${this.region}.on.aws`,
       "cluster-id": cluster.ref,
     });
   }

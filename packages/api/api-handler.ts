@@ -1,15 +1,15 @@
-import { ServerlessAdapter } from '@h4ad/serverless-adapter';
-import { FastifyFramework } from '@h4ad/serverless-adapter/frameworks/fastify';
-import { DefaultHandler } from '@h4ad/serverless-adapter/handlers/default';
-import { PromiseResolver } from '@h4ad/serverless-adapter/resolvers/promise';
-import { ApiGatewayV1Adapter } from '@h4ad/serverless-adapter/adapters/aws';
-import { Subsegment, Tracer } from '@aws-lambda-powertools/tracer';
+import { type Subsegment, Tracer } from "@aws-lambda-powertools/tracer";
+import { ServerlessAdapter } from "@h4ad/serverless-adapter";
+import { ApiGatewayV1Adapter } from "@h4ad/serverless-adapter/adapters/aws";
+import { FastifyFramework } from "@h4ad/serverless-adapter/frameworks/fastify";
+import { DefaultHandler } from "@h4ad/serverless-adapter/handlers/default";
+import { PromiseResolver } from "@h4ad/serverless-adapter/resolvers/promise";
 
-const tracer = new Tracer({ serviceName: 'dsqlExample' });
+const tracer = new Tracer({ serviceName: "dsqlExample" });
 
-import { init } from './api';
+import { init } from "./api";
 
-const adapterHandlerPromise = (async function() {
+const adapterHandlerPromise = (async () => {
   const app = await init();
   return ServerlessAdapter.new(app)
     .setFramework(new FastifyFramework())

@@ -10,3 +10,4 @@ cdk.out
 
 .hypothesis/
 schemathesis-report/
+test-events/envs.json

@@ -7,7 +7,7 @@ export default defineConfig({
     url: process.env.DATABASE_URL!,
   },
   migrations: {
-    table: 'migrations',
-    schema: 'public',
+    table: "migrations",
+    schema: "public",
   },
 });
