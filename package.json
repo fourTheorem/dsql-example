@@ -3,7 +3,9 @@
   "type": "module",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "prepare": "husky"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -15,10 +17,17 @@
   ],
   "devDependencies": {
     "@biomejs/biome": "2.0.5",
-    "@tsconfig/recommended": "^1.0.8"
+    "@tsconfig/recommended": "^1.0.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.2"
   },
   "dependencies": {
     "@aws-lambda-powertools/tracer": "^2.22.0",
     "@smithy/service-error-classification": "^4.0.5"
+  },
+  "lint-staged": {
+    "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+      "biome check --write"
+    ]
   }
 }
