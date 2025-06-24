@@ -1,11 +1,13 @@
 import fastifySwagger from '@fastify/swagger';
 import { and, eq } from 'drizzle-orm';
 import fastify from 'fastify';
+import { kRouteContext } from 'fastify/lib/symbols';
 import { jsonSchemaTransform, serializerCompiler, validatorCompiler, ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from 'zod/v4';
 import { getDb, testConnection } from '../db/connection';
 import { items, lists } from '../model/schema';
 import * as apiSchema from './api-schema';
+import { tracer } from './common';
 
 getDb();  // Initiate connection at module load time
 
@@ -47,6 +49,13 @@ export async function init() {
       transform: jsonSchemaTransform,
     })
     .withTypeProvider<ZodTypeProvider>();
+
+  app.addHook('onRequest', async (request, reply) => {
+    // const context = request[kRouteContext];
+    // const routeId = context.config.routeId
+    const { method, url } = request.routeOptions;
+    tracer.putAnnotation('routeId', `${method} ${url}`);
+  });
 
   app.get('/openapi.json', { schema: { hide: true } }, async () => {
     return app.swagger();
@@ -229,7 +238,7 @@ export async function init() {
 
 if (!process.env.AWS_LAMBDA_RUNTIME_API) {
   // called directly i.e. "ts-node api-handler.ts"
-  (async function() {
+  (async function () {
     (await init()).listen({ port: 3000 }, (err) => {
       if (err) console.error(err);
       console.log('server listening on 3000');

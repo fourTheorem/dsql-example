@@ -3,8 +3,8 @@ import { check, sleep } from 'k6';
 const { BASE_URL } = __ENV;
 
 export const options = {
-  vus: 100,           // number of concurrent users
-  duration: '1m',     // test duration
+  vus: 1000,           // number of concurrent users
+  duration: '2m',     // test duration
   thresholds: {
     http_req_failed: ['rate<0.01'],
     http_req_duration: ['p(95)<800'],
