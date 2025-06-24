@@ -12,8 +12,9 @@ This repo provides everything you need to deploy and load-test an API using a Am
 - [Creating the Database Schema](#creating-the-database-schema)
 - [OpenAPI specification](#openapi-specification)
 - [Running a Load Test](#running-a-load-test)
-- [Exporing the Database using `psql`](#exporing-the-database-using-psql)
+- [Exploring the Database using `psql`](#exploring-the-database-using-psql)
 - [Exploring Costs 💰](#exploring-costs-%F0%9F%92%B0)
+- [Running the API locally](#running-the-api-locally)
 
 <!-- tocstop -->
 
@@ -99,7 +100,7 @@ If you are feeling more ambitious and don't mind spending a bit more on Lambda, 
 k6 run ./test/load/full-api-test.js --vus 1000 --duration 2m
 ```
 
-## Exporing the Database using `psql`
+## Exploring the Database using `psql`
 
 One option to connect to your database is to use AWS Cloudshell. For instructions on how to do this, and other connection examples, see https://docs.aws.amazon.com/aurora-dsql/latest/userguide/getting-started.html.
 
@@ -117,4 +118,15 @@ calculating cost based on DSQL usage, we discovered [Marc Bowes' guide and scrip
 
 ```shell
 ./fetch_dpus.sh <DSQL_CLUSTER_ID>
+```
+
+## Running the API locally
+
+If you want to dive deeper into this architecture, make changes and iterate quickly, you can run the API locally.
+
+You can either run your local API against DSQL or a local PostgreSQL
+by setting `DB_ENDPOINT` to `localhost` or your cluster endpoint domain name.
+
+```sh
+npx tsx ./packages/api/api.ts
 ```

@@ -193,7 +193,7 @@ export async function init() {
       await db
         .insert(lists)
         .values({ ...updateBody, id })
-        .onConflictDoUpdate({ target: lists.id, set: body });
+        .onConflictDoUpdate({ target: lists.id, set: updateBody });
       reply.send();
     },
   );
@@ -212,7 +212,10 @@ export async function init() {
       if (Object.keys(request.body).length === 0) {
         return reply.send();
       }
-      db.update(lists).set(request.body).where(eq(lists.id, request.params.id));
+      await db
+        .update(lists)
+        .set(request.body)
+        .where(eq(lists.id, request.params.id));
       reply.send();
     },
   );
