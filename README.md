@@ -4,6 +4,19 @@ An example API backend using Amazon Aurora DSQL ✨.
 
 This repo provides everything you need to deploy and load-test an API using a Amazon DSQL PostgreSQL backend.
 
+<!-- toc -->
+
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Deployment](#deployment)
+- [Creating the Database Schema](#creating-the-database-schema)
+- [OpenAPI specification](#openapi-specification)
+- [Running a Load Test](#running-a-load-test)
+- [Exporing the Database using `psql`](#exporing-the-database-using-psql)
+- [Exploring Costs 💰](#exploring-costs-%F0%9F%92%B0)
+
+<!-- tocstop -->
+
 ## Features
 
 - [Fastify](https://fastify.dev/) API backend using AWS Lambda and [Drizzle ORM](https://drizzle.team)
@@ -53,23 +66,26 @@ export DATABASE_URL=$(npx tsx ./packages/cli/cli.ts)
 npx drizzle-kit push
 ```
 
-## Exporing the Database using `psql`
+## OpenAPI specification
 
-One option to connect to your database is to use AWS Cloudshell. For instructions on how to do this, and other connection examples, see https://docs.aws.amazon.com/aurora-dsql/latest/userguide/getting-started.html.
+You can access the API specification at `${BASE_URL}/openapi.json`.
 
-A helper script used by CloudShell is also provided here so you can connect using `psql`. It uses the AWS CLI to generate an IAM auth token for your connection.
+The API provides CRUD endpoints for lists of items.
+Each resource is very simple, containing just an ID (UUID v4) and a name.
+
+Explore it with the Redocly CLI like this:
 
 ```shell
-./bin/dsql-connect --hostname DSQL_HOST --region eu-west-1 --database postgres --username admin
+npx @redocly/cli preview-docs ${BASE_URL}/openapi.json
 ```
-You'll need to replace `DSQL_HOST` with your cluster endpoint address. This is printed as a CloudFormation output (`DsqlExampleStack.endpoint`) when you run `cdk deploy` as instructed above.
-
 
 ## Running a Load Test
 
 An excellent way of generating API load is using [k6](https://k6.io/).
 You will need to follow the instructions to install `k6` locally.
 Once that's done, you can run the default load test which simulates 100 virtual users (VUs) over a period of one minute.
+
+✋ Make sure you have set `DATABASE_URL` in your shell as we mentioned above.
 
 ```shell
 k6 run ./test/load/full-api-test.js
@@ -82,6 +98,17 @@ If you are feeling more ambitious and don't mind spending a bit more on Lambda, 
 ```shell
 k6 run ./test/load/full-api-test.js --vus 1000 --duration 2m
 ```
+
+## Exporing the Database using `psql`
+
+One option to connect to your database is to use AWS Cloudshell. For instructions on how to do this, and other connection examples, see https://docs.aws.amazon.com/aurora-dsql/latest/userguide/getting-started.html.
+
+A helper script used by CloudShell is also provided here so you can connect using `psql`. It uses the AWS CLI to generate an IAM auth token for your connection.
+
+```shell
+./bin/dsql-connect --hostname DSQL_HOST --region eu-west-1 --database postgres --username admin
+```
+You'll need to replace `DSQL_HOST` with your cluster endpoint address. This is printed as a CloudFormation output (`DsqlExampleStack.endpoint`) when you run `cdk deploy` as instructed above.
 
 ## Exploring Costs 💰
 
