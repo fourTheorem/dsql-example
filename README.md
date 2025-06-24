@@ -1,8 +1,8 @@
 # DSQL Example
 
 An example API backend using Amazon Aurora DSQL ✨.
-t
-This report provides everything you need to deploy and load-test an API using a Amazon DSQL PostgreSQL backend.
+
+This repo provides everything you need to deploy and load-test an API using a Amazon DSQL PostgreSQL backend.
 
 ## Features
 
@@ -81,4 +81,13 @@ If you are feeling more ambitious and don't mind spending a bit more on Lambda, 
 1,000 virtual users over two minutes:
 ```shell
 k6 run ./test/load/full-api-test.js --vus 1000 --duration 2m
+```
+
+## Exploring Costs 💰
+
+Thanks to [Alessandro Volpicella's Amazon Aurora DSQL Pricing Guide](https://awsfundamentals.com/blog/amazon-dsql-pricing-guide), we discovered a handy script for
+calculating cost based on DSQL usage, we discovered [Marc Bowes' guide and script](https://marc-bowes.com/dsql-how-to-spend-a-dollar.html) which we include [here](./fetch_dpus.sh).
+
+```shell
+./fetch_dpus.sh <DSQL_CLUSTER_ID>
 ```
