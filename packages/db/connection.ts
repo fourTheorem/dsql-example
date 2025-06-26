@@ -10,17 +10,44 @@ if (!AWS_REGION || !DB_ENDPOINT) {
   );
 }
 
+async function withTiming<T>(segmentName: string, context: () => Promise<T>) {
+  if (!process.env.AWS_LAMBDA_RUNTIME_API) {
+    return await context();
+  }
+  const start = performance.now();
+  try {
+    const result = await context();
+    return result;
+  } catch (error) {
+    throw error;
+  } finally {
+    const end = performance.now();
+    const durationMs = end - start;
+
+    const { MetricUnit } = await import("@aws-lambda-powertools/metrics");
+    const { metrics } = await import("../api/common");
+    metrics.addMetric(
+      `${segmentName}Duration`,
+      MetricUnit.Milliseconds,
+      durationMs,
+    );
+    metrics.publishStoredMetrics();
+  }
+}
+
 const dbUrlPromise = (async function createDbUrl() {
   let url: string;
   if (DB_ENDPOINT === "localhost") {
     url = `postgres://postgres:postgres@localhost:5432/postgres`;
   } else {
-    const token = await generateAdminToken();
-    const dbUser = "admin";
-    const dbPort = 5432;
-    const databaseName = "postgres";
-    const encodedToken = encodeURIComponent(token);
-    url = `postgres://${dbUser}:${encodedToken}@${DB_ENDPOINT}:${dbPort}/${databaseName}?sslmode=require`;
+    url = await withTiming("DbUrlTime", async () => {
+      const token = await generateAdminToken();
+      const dbUser = "admin";
+      const dbPort = 5432;
+      const databaseName = "postgres";
+      const encodedToken = encodeURIComponent(token);
+      return `postgres://${dbUser}:${encodedToken}@${DB_ENDPOINT}:${dbPort}/${databaseName}?sslmode=require`;
+    });
   }
 
   return url;
@@ -28,19 +55,21 @@ const dbUrlPromise = (async function createDbUrl() {
 
 const dbPromise = (async function createDb() {
   const dbUrl = await dbUrlPromise;
-  let xrayPg: typeof pg;
-  if (process.env.AWS_LAMBDA_RUNTIME_API) {
-    const xraySdk = await import("aws-xray-sdk");
-    xrayPg = xraySdk.capturePostgres(pg) as typeof pg;
-  } else {
-    xrayPg = pg;
-  }
+  return withTiming("DbTime", async () => {
+    let xrayPg: typeof pg;
+    if (process.env.AWS_LAMBDA_RUNTIME_API) {
+      const xraySdk = await import("aws-xray-sdk");
+      xrayPg = xraySdk.capturePostgres(pg) as typeof pg;
+    } else {
+      xrayPg = pg;
+    }
 
-  const client = new xrayPg.Client({
-    connectionString: dbUrl,
+    const client = new xrayPg.Client({
+      connectionString: dbUrl,
+    });
+    await client.connect();
+    return drizzle({ client, schema });
   });
-  await client.connect();
-  return drizzle({ client, schema });
 })();
 
 export async function getDbUrl() {

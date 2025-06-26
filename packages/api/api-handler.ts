@@ -1,9 +1,10 @@
-import { type Subsegment, Tracer } from "@aws-lambda-powertools/tracer";
+import { Tracer } from "@aws-lambda-powertools/tracer";
 import { ServerlessAdapter } from "@h4ad/serverless-adapter";
 import { ApiGatewayV1Adapter } from "@h4ad/serverless-adapter/adapters/aws";
 import { FastifyFramework } from "@h4ad/serverless-adapter/frameworks/fastify";
 import { DefaultHandler } from "@h4ad/serverless-adapter/handlers/default";
 import { PromiseResolver } from "@h4ad/serverless-adapter/resolvers/promise";
+import type { Subsegment } from "aws-xray-sdk-core";
 
 const tracer = new Tracer({ serviceName: "dsqlExample" });
 
