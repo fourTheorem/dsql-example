@@ -1,0 +1,63 @@
+#!/bin/bash
+
+VERSION="1.0.0"
+
+# Function to print usage
+usage() {
+    echo "Usage: $0 --hostname <hostname> --region <region> --database <database> --username <username>"
+    echo "  --hostname  Hostname of the DSQL cluster"
+    echo "  --region    AWS region"
+    echo "  --database  Database name"
+    echo "  --username  Username"
+    echo "Options:"
+    echo "  --help      Show this help message"
+    echo "  --version   Show version information"
+    exit 0
+}
+
+# Version function
+show_version() {
+    echo "$(basename "$0" .sh) version $VERSION"
+    exit 0
+}
+
+# Parse command line arguments
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        --hostname) hostname="$2"; shift 2 ;;
+        --region) region="$2"; shift 2 ;;
+        --database) database="$2"; shift 2 ;;
+        --username) username="$2"; shift 2 ;;
+        --help) usage ;;
+        --version) show_version ;;
+        *) echo "Unknown option: $1"; usage ;;
+    esac
+done
+
+# Check if required arguments are provided
+if [[ -z "$hostname" || -z "$region" || -z "$database" || -z "$username" ]]; then
+    echo "Error: Missing required arguments"
+    usage
+fi
+
+# Generate the appropriate auth token
+if [[ "$username" == "admin" ]]; then
+    auth_token=$(aws dsql generate-db-connect-admin-auth-token --hostname "$hostname" --region "$region")
+else
+    auth_token=$(aws dsql generate-db-connect-auth-token --hostname "$hostname" --region "$region")
+fi
+
+# Check if auth token generation was successful
+if [[ $? -ne 0 || -z "$auth_token" ]]; then
+    echo "Error: Failed to generate auth token"
+    exit 1
+fi
+
+# Set up the connection command
+PGPASSWORD="$auth_token" PGSSLMODE=require psql --dbname "$database" --host "$hostname" --username "$username" --quiet
+
+# Check if the connection was successful
+if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to connect to the database"
+    exit 1
+fi
