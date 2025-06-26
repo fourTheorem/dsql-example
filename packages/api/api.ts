@@ -14,7 +14,6 @@ import * as apiSchema from "./api-schema";
 import { tracer } from "./common";
 
 getDb(); // Initiate connection at module load time
-
 const defaultResponseSchema = {
   400: z.object({
     error: z.string(),
